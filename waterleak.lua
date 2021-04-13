@@ -1,18 +1,16 @@
 local master = tonumber(obj.get('master'), _)
 local master_trigger = tonumber(obj.get('master_trigger'), _)
-local service = tonumber(obj.get('service'), _)
 local service_trigger = tonumber(obj.get('service_trigger'), _)
 
 local relay = 0
 local set = 0
 
+local wday, hour, min = nil, 5, 0
 local time = 10
 local wl = {['wl_relay_1'] = {'wl_sensor_1', 'wl_sensor_2'}, ['wl_relay_2'] = {'sensor_3', 's4', 's5'}, ['wl_relay_3'] = {'s6'}}
 local auto = false	
 
 if master > 0 then
-  	obj.set('service', os.time() + 86400) 
-  
 	if master_trigger == 0 then 
     	master_trigger = os.time()
     	obj.set('master_trigger', master_trigger)
@@ -21,11 +19,18 @@ if master > 0 then
     	set = -1
     end  
 else
-  	if service < os.time() then
+  	if ((wday == nil or wday == Event.Time.wday) and (hour == nil or hour == Event.Time.hour) and (min == nil or min == Event.Time.min)) and
+    	not (wday == nil and hour == nil and min == nil) then
     	if service_trigger == 0 then
-      		service_trigger = os.time()
+      		if wday ~= nil then 
+        		service_trigger = os.time() + 86400
+        	elseif hour ~= nil then
+        		service_trigger = os.time() + 3600
+        	elseif min ~= nil then
+        		service_trigger = os.time() + 60
+        	end
+        
       		obj.set('service_trigger', service_trigger)
-   			obj.set('service', os.time() + 86400)   
       
       		print('SERVICE ON')
 			set = -1
@@ -129,7 +134,7 @@ for r,s in pairs(wl) do
   	obj.set(r, stage)
 end  
 
-if master == 0 and service_trigger > 0 and waiting == relay then
+if master == 0 and service_trigger > 0 and service_trigger < os.time() and waiting == relay then
 	obj.set('service_trigger', 0)
 	
   	print('SERVICE OFF')
