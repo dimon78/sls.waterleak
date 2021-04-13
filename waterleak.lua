@@ -11,7 +11,7 @@ local wl = {['wl_relay_1'] = {'wl_sensor_1', 'wl_sensor_2'}, ['wl_relay_2'] = {'
 local auto = false	
 
 if master > 0 then
-  	obj.set('service', os.time() + 60) 
+  	obj.set('service', os.time() + 86400) 
   
 	if master_trigger == 0 then 
     	master_trigger = os.time()
@@ -25,7 +25,7 @@ else
     	if service_trigger == 0 then
       		service_trigger = os.time()
       		obj.set('service_trigger', service_trigger)
-   			obj.set('service', os.time() + 60)   
+   			obj.set('service', os.time() + 86400)   
       
       		print('SERVICE ON')
 			set = -1
